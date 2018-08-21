@@ -1,32 +1,71 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-
-import A from './A';
-import Img from './Img';
-import NavBar from './NavBar';
-import HeaderLink from './HeaderLink';
-import Banner from './banner.jpg';
+import { Link } from 'react-router-dom';
+import LocaleToggle from 'containers/LocaleToggle';
+import { Nav, Navbar, NavItem } from 'react-bootstrap';
+import localStorage from 'localStorage';
 import messages from './messages';
 
 /* eslint-disable react/prefer-stateless-function */
-class Header extends React.Component {
+class HeaderComponent extends React.Component {
+  signOut = () => {
+    localStorage.removeItem("token");
+    location.reload()
+    this.props.history.push('/');
+  }
   render() {
     return (
       <div>
-        <A href="https://twitter.com/mxstbr">
-          <Img src={Banner} alt="react-boilerplate - Logo" />
-        </A>
-        <NavBar>
-          <HeaderLink to="/">
-            <FormattedMessage {...messages.home} />
-          </HeaderLink>
-          <HeaderLink to="/features">
-            <FormattedMessage {...messages.features} />
-          </HeaderLink>
-        </NavBar>
+        <LocaleToggle />
+        <Navbar>
+          <Navbar.Header>
+            <Navbar.Brand>
+              <Link to="/">Natchshop</Link>
+            </Navbar.Brand>
+          </Navbar.Header>
+            <Nav pullRight>
+              <li eventKey={1}>
+              <Link to="/">
+                <FormattedMessage {...messages.home} />
+              </Link>
+            </li>  
+            <li eventKey={2}>
+              <Link to="/about">
+                <FormattedMessage {...messages.aboutus} />
+              </Link>
+            </li> 
+            <li eventKey={2}>
+              <Link to="/news">
+                <FormattedMessage {...messages.news} />
+              </Link>
+            </li> 
+            <li eventKey={3}>
+              <Link to="/products">
+                <FormattedMessage {...messages.products} />
+              </Link>
+            </li> 
+            <li eventKey={3}>
+              <Link to="/promos">
+                <FormattedMessage {...messages.promo} />
+              </Link>
+            </li> 
+            {
+              localStorage.token == undefined ?
+              <li eventKey={3}>
+                <Link to="/contactus">
+                  <FormattedMessage {...messages.contactus} />
+                </Link>
+              </li>  
+              :  
+              <li>
+                <a onClick={this.signOut} ><FormattedMessage {...messages.signout} /></a>
+              </li>  
+            }       
+            </Nav>
+        </Navbar>       
       </div>
     );
   }
 }
 
-export default Header;
+export default HeaderComponent;

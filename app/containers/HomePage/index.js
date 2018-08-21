@@ -33,15 +33,38 @@ import { makeSelectUsername } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 
+import { Carousel } from 'react-bootstrap';
+
+import axios from 'axios'
+import { baseUrl } from '../../config'
 /* eslint-disable react/prefer-stateless-function */
 export class HomePage extends React.PureComponent {
-  /**
-   * when initial state username is not null, submit the form to load repos
-   */
-  componentDidMount() {
+  constructor(props){
+    super(props)
+    this.state = {
+      bannerHome: []
+    }
+  }
+
+  componentDidMount(){
     if (this.props.username && this.props.username.trim().length > 0) {
       this.props.onSubmitForm();
     }
+    
+    axios.get(baseUrl + '/banners/listhome')
+    .then((response) => {
+        console.log("Banner LIST", response);
+        this.setState({
+          bannerHome: response.data
+        });
+    })
+    .catch(function (error) {
+    console.log(error);
+    })
+  }
+
+  onChange = (a, b, c) => {
+    console.log(a, b, c);
   }
 
   render() {
@@ -51,6 +74,8 @@ export class HomePage extends React.PureComponent {
       error,
       repos,
     };
+
+    const { bannerHome } = this.state
 
     return (
       <article>
@@ -62,6 +87,18 @@ export class HomePage extends React.PureComponent {
           />
         </Helmet>
         <div>
+
+        <Carousel>
+          {
+            bannerHome.map((item, i) => (
+              <Carousel.Item key={i}>
+              <img width="100%" height={500} alt={item.title} src={`${baseUrl}/public/${item.img_url}`} />
+            </Carousel.Item>
+            ))
+          }
+        </Carousel>
+        <div className="container">
+
           <CenteredSection>
             <H2>
               <FormattedMessage {...messages.startProjectHeader} />
@@ -91,6 +128,7 @@ export class HomePage extends React.PureComponent {
             </Form>
             <ReposList {...reposListProps} />
           </Section>
+        </div>
         </div>
       </article>
     );

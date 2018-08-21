@@ -6,6 +6,7 @@
   "boilerplate.components.Header.features": "",
   "boilerplate.components.Header.home": "",
   "boilerplate.containers.FeaturePage.css.header": "",
+  "boilerplate.containers.AboutPage.header": "About Us",
   "boilerplate.containers.FeaturePage.css.message":
     "Die nächste Generation von CSS",
   "boilerplate.containers.FeaturePage.feedback.header": "Sofortiges Feedback",
@@ -43,6 +44,7 @@
   "boilerplate.containers.HomePage.tryme.message":
     "Zeige die Github Repositories von",
   "boilerplate.containers.LocaleToggle.de": "",
+  "boilerplate.containers.LocaleToggle.zh": "",
   "boilerplate.containers.LocaleToggle.en": "",
   "boilerplate.containers.NotFoundPage.header": "Seite nicht gefunden."
 }
