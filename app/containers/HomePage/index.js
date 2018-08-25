@@ -6,80 +6,73 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import injectReducer from 'utils/injectReducer';
+import injectSaga from 'utils/injectSaga';
+
+import reducer from './reducer';
+import saga from './saga';
+
+import axios from 'axios';
+
 import { Helmet } from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 
-import injectReducer from 'utils/injectReducer';
-import injectSaga from 'utils/injectSaga';
+import { Carousel } from 'react-bootstrap';
+
+import { baseUrl } from '../../config';
 import {
   makeSelectRepos,
   makeSelectLoading,
   makeSelectError,
 } from 'containers/App/selectors';
-import H2 from 'components/H2';
-import ReposList from 'components/ReposList';
-import AtPrefix from './AtPrefix';
-import CenteredSection from './CenteredSection';
-import Form from './Form';
-import Input from './Input';
-import Section from './Section';
-import messages from './messages';
 import { loadRepos } from '../App/actions';
 import { changeUsername } from './actions';
 import { makeSelectUsername } from './selectors';
-import reducer from './reducer';
-import saga from './saga';
-
-import { Carousel } from 'react-bootstrap';
-
-import axios from 'axios'
-import { baseUrl } from '../../config'
 /* eslint-disable react/prefer-stateless-function */
+
 export class HomePage extends React.PureComponent {
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       bannerHome: [],
-      products: []
-    }
+      products: [],
+    };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     if (this.props.username && this.props.username.trim().length > 0) {
       this.props.onSubmitForm();
     }
 
-    axios.get(baseUrl + '/products/list')
-    .then((response) => {
-        this.setState({
-            products: response.data
-        });
-    })
-    
-    axios.get(baseUrl + '/banners/listhome')
-    .then((response) => {
-        console.log("Banner LIST", response);
-        this.setState({
-          bannerHome: response.data
-        });
-    })
-    .catch(function (error) {
-    console.log(error);
-    })
+    axios.get(`${baseUrl}/products/list`).then(response => {
+      this.setState({
+        products: response.data,
+      });
+    });
 
+    axios
+      .get(`${baseUrl}/banners/listhome`)
+      .then(response => {
+        console.log('Banner LIST', response);
+        this.setState({
+          bannerHome: response.data,
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
-
 
   onChange = (a, b, c) => {
     console.log(a, b, c);
-  }
+  };
 
-  onProductDetails = (id) => {
-    this.props.history(`/product/${id}`)
-  }
+  onProductDetails = id => {
+    this.props.history.push(`/product/${id}`);
+  };
 
   render() {
     const { loading, error, repos } = this.props;
@@ -89,10 +82,11 @@ export class HomePage extends React.PureComponent {
       repos,
     };
 
-    const { bannerHome } = this.state
+    const { bannerHome } = this.state;
 
-    const productFeatured = this.state.products.slice(Math.max(this.state.products.length - 4, 1))
-
+    const productFeatured = this.state.products.slice(
+      Math.max(this.state.products.length - 4, 1),
+    );
 
     return (
       <article>
@@ -104,33 +98,37 @@ export class HomePage extends React.PureComponent {
           />
         </Helmet>
         <div>
-
-        <Carousel>
-          {
-            bannerHome.map((item, i) => (
+          <Carousel>
+            {bannerHome.map((item, i) => (
               <Carousel.Item key={i}>
-              <img width="100%" height={500} alt={item.title} src={`${baseUrl}/public/${item.img_url}`} />
-            </Carousel.Item>
-            ))
-          }
-        </Carousel>
-        <div className="container">
-          <div className="row text-center">
-            <h1>Products</h1>
-            {
-              productFeatured.map((item, index) => (
+                <img
+                  width="100%"
+                  height={500}
+                  alt={item.title}
+                  src={`${baseUrl}/public/${item.img_url}`}
+                />
+              </Carousel.Item>
+            ))}
+            }
+          </Carousel>
+          <div className="container">
+            <div className="row text-center">
+              <h1>Products</h1>
+              {productFeatured.map((item, index) => (
                 <div className="col-xs-6 col-md-3" key={index}>
-                  <a onClick={() => {this.onProductDetails(item.id)}} className="thumbnail">
-                    <img
-                      src={`${baseUrl}/public/${item.img_url}`}
-                      alt="..."
-                    />
+                  <a
+                    onClick={() => {
+                      this.onProductDetails(item.id);
+                    }}
+                    className="thumbnail"
+                  >
+                    <img src={`${baseUrl}/public/${item.img_url}`} />
                   </a>
                 </div>
-              ))
-            }
+              ))}
+              }
+            </div>
           </div>
-        </div>
         </div>
       </article>
     );
