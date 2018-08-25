@@ -42,7 +42,8 @@ export class HomePage extends React.PureComponent {
   constructor(props){
     super(props)
     this.state = {
-      bannerHome: []
+      bannerHome: [],
+      products: []
     }
   }
 
@@ -50,6 +51,13 @@ export class HomePage extends React.PureComponent {
     if (this.props.username && this.props.username.trim().length > 0) {
       this.props.onSubmitForm();
     }
+
+    axios.get(baseUrl + '/products/list')
+    .then((response) => {
+        this.setState({
+            products: response.data
+        });
+    })
     
     axios.get(baseUrl + '/banners/listhome')
     .then((response) => {
@@ -61,10 +69,16 @@ export class HomePage extends React.PureComponent {
     .catch(function (error) {
     console.log(error);
     })
+
   }
+
 
   onChange = (a, b, c) => {
     console.log(a, b, c);
+  }
+
+  onProductDetails = (id) => {
+    this.props.history(`/product/${id}`)
   }
 
   render() {
@@ -76,6 +90,9 @@ export class HomePage extends React.PureComponent {
     };
 
     const { bannerHome } = this.state
+
+    const productFeatured = this.state.products.slice(Math.max(this.state.products.length - 4, 1))
+
 
     return (
       <article>
@@ -98,36 +115,21 @@ export class HomePage extends React.PureComponent {
           }
         </Carousel>
         <div className="container">
-
-          <CenteredSection>
-            <H2>
-              <FormattedMessage {...messages.startProjectHeader} />
-            </H2>
-            <p>
-              <FormattedMessage {...messages.startProjectMessage} />
-            </p>
-          </CenteredSection>
-          <Section>
-            <H2>
-              <FormattedMessage {...messages.trymeHeader} />
-            </H2>
-            <Form onSubmit={this.props.onSubmitForm}>
-              <label htmlFor="username">
-                <FormattedMessage {...messages.trymeMessage} />
-                <AtPrefix>
-                  <FormattedMessage {...messages.trymeAtPrefix} />
-                </AtPrefix>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="mxstbr"
-                  value={this.props.username}
-                  onChange={this.props.onChangeUsername}
-                />
-              </label>
-            </Form>
-            <ReposList {...reposListProps} />
-          </Section>
+          <div className="row text-center">
+            <h1>Products</h1>
+            {
+              productFeatured.map((item, index) => (
+                <div className="col-xs-6 col-md-3" key={index}>
+                  <a onClick={() => {this.onProductDetails(item.id)}} className="thumbnail">
+                    <img
+                      src={`${baseUrl}/public/${item.img_url}`}
+                      alt="..."
+                    />
+                  </a>
+                </div>
+              ))
+            }
+          </div>
         </div>
         </div>
       </article>
