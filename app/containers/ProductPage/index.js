@@ -106,18 +106,18 @@ export default class ProductPage extends React.Component {
             pageSize: 10,
           }}
           dataSource={this.state.products}
-          renderItem={item => (
+          renderItem={(item , i) => (
             <List.Item
-              key={item.id}
+              key={i}
             >
-            <div class="media" onClick={() => {this.productDetails(item.id)}} style={{ cursor: "pointer" }}>
-              <div class="media-left">
+            <div className="media" onClick={() => {this.productDetails(item.id)}} style={{ cursor: "pointer" }}>
+              <div className="media-left">
                 <span>
                   <img width={170} alt="logo" src={`${baseUrl}/public/${item.img_url}`} />
                 </span>
               </div>
-              <div class="media-body">
-                <h4 class="media-heading">{item.name}</h4>
+              <div className="media-body">
+                <h4 className="media-heading">{item.name}</h4>
                 <small>{item.description}</small>
               </div>
             </div>

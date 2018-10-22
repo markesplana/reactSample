@@ -44,11 +44,12 @@ class AddPromoPage extends React.Component {
         this.setState({
           uploading: true,
         })
-        const { name, description, price, photo, details_image, quantity, promo_expiry } = values
+        const { name, description, price, photo, details_image, quantity, promo_expiry, link } = values
         const fileData = new FormData();
         fileData.append('photo', photo[0].originFileObj)
         fileData.append('details_image', details_image[0].originFileObj);
         fileData.append('name', name);
+        fileData.append('link', link);
         fileData.append('quantity', quantity);
         fileData.append('promo_expiry', promo_expiry);
         fileData.append('description', description);
@@ -149,7 +150,16 @@ class AddPromoPage extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label><FormattedMessage {...messages.promoimage} /></label>
+                  <label><FormattedMessage {...messages.link} /></label>
+                  <br />
+                  {getFieldDecorator('link', {
+                    rules: [{ required: true, message: 'Please input product quantity!' }],
+                  })(
+                    <Input />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label>1 <FormattedMessage {...messages.promoimage} /> (300 × 300 pixels)</label>
                   <br />
                   {getFieldDecorator('photo', {
                     valuePropName: 'fileList',
@@ -171,7 +181,7 @@ class AddPromoPage extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label><FormattedMessage {...messages.otherimage} /></label>
+                  <label>1 <FormattedMessage {...messages.otherimage} />  (650px width)</label>
                   <br />
                   {getFieldDecorator('details_image', {
                     valuePropName: 'fileList',

@@ -122,7 +122,7 @@ class AddProductBannerPage extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label><FormattedMessage {...messages.bannerimage} /></label>
+                  <label>1 <FormattedMessage {...messages.bannerimage} /> ( 1020 x 800 pixels )</label>
                   <br />
                   {getFieldDecorator('photo', {
                     valuePropName: 'fileList',

@@ -30,7 +30,6 @@ class LoginPage extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', this.props);
         axios.post(baseUrl + '/admin/signin', {
           username: values.username,
           password: values.password

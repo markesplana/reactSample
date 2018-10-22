@@ -25,5 +25,17 @@ export default defineMessages({
   lastname: {
     id: 'boilerplate.containers.ContactPage.lastname',
     defaultMessage: 'Last Name',
+  },
+  subject: {
+    id: 'boilerplate.containers.ContactPage.subject',
+    defaultMessage: 'Subject',
+  },
+  contact: {
+    id: "boilerplate.containers.contact",
+    defineMessages: "Contact Number"
+  },
+  address: {
+    id: "boilerplate.containers.address",
+    defineMessages: "Address"
   }
 });

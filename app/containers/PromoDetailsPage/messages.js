@@ -26,4 +26,8 @@ export default defineMessages({
     id: "boilerplate.containers.PromoDetailPage.quantity",
     defaultMessage: "Quantity"
   },
+  link: {
+    id: "boilerplate.containers.joinin",
+    defaultMessage: "Join In"
+  }
 });

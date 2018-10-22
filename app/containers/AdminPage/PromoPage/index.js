@@ -12,7 +12,7 @@ import messages from './messages';
 
 import { Button, Table, Divider } from 'antd'
 
-import Countdown from 'react-countdown-moment'
+import Countdown from 'react-sexy-countdown'
 import moment from 'moment';
 
 import { baseUrl } from '../../../config'
@@ -28,6 +28,7 @@ export default class AdminPromoPage extends React.Component {
   componentWillMount(){
     axios.get(baseUrl + '/products/promos')
     .then((response) => {
+        console.log("PROMOS". response)
         this.setState({
             products: response.data
         });
@@ -59,7 +60,7 @@ export default class AdminPromoPage extends React.Component {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: '45%',
+      width: '40%',
       render: (text, record) => 
         <div className="media" style={{ cursor: "pointer" }} onClick={() => { this.productDetails(record.id) }} >
           <div className="media-left">
@@ -83,9 +84,24 @@ export default class AdminPromoPage extends React.Component {
       title: 'Expiration',
       dataIndex: 'promo_expiry',
       key: 'promo_expiry',
+      width: '30%',
       render: (text, record) => {
-        const endDate = moment(record.promo_expiry)
-        return <Countdown endDate={endDate} />
+        const endDate = moment(record.promo_expiry, "YYYY-MM-DD")
+        return <Countdown
+          date={endDate}
+          onEndCountdown={ (count) => console.log(count) }
+          displayText={{
+            Days: 'Days',
+            Day: 'Day',
+            Hours: 'Hours',
+            Min: 'Min',
+            Sec: 'Sec',
+          }}
+          lastTextTime={{
+            Day: 'D'
+          }}
+          isDayDoubleZero={ true }
+        />
       }
     },{
       title: 'Action',
@@ -94,6 +110,8 @@ export default class AdminPromoPage extends React.Component {
         <span>
           <Divider type="vertical" />
           <a href="javascript:;" onClick={() => { this.handleDelete(record.id) }} >Delete</a>
+          {" "} | {" "} 
+          <a href="javascript:;" onClick={() => { this.props.history.push(`/editpromo/${record.id}`) }} >Edit</a>
         </span>
       ),
     }];

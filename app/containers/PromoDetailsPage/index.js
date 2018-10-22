@@ -11,7 +11,7 @@ import axios from 'axios'
 import H1 from 'components/H1';
 import messages from './messages';
 
-import Countdown from 'react-countdown-moment'
+import Countdown from 'react-sexy-countdown'
 import moment from 'moment';
 
 import { baseUrl } from '../../config'
@@ -65,6 +65,12 @@ export default class PromoDetailsPage extends React.Component {
           </div>
           <div className="col-md-8">
             <p><strong>{product.name}</strong></p>
+            <div>
+            <a href={product.link} className="btn btn-primary" target="_blank">
+              <small><FormattedMessage {...messages.link} /></small>
+            </a>
+            </div>
+            <br />  
             <small><FormattedMessage {...messages.promodescription} />:</small>
             <p>{product.description}</p>
             <small><FormattedMessage {...messages.price} />:</small>
@@ -72,7 +78,23 @@ export default class PromoDetailsPage extends React.Component {
             <small><FormattedMessage {...messages.quantity} />:</small>
             <p>{product.quantity}</p>
             <small><FormattedMessage {...messages.time} />:</small>
-            <p><Countdown endDate={endDate} /></p>
+            <div style={{ width: 250 }}>
+            <Countdown
+                date={ moment(product.promo_expiry, "YYYY-MM-DD")}
+                onEndCountdown={ (count) => console.log(count) }
+                displayText={{
+                  Days: 'Days',
+                  Day: 'Day',
+                  Hours: 'Hours',
+                  Min: 'Min',
+                  Sec: 'Sec',
+                }}
+                lastTextTime={{
+                  Day: 'D'
+                }}
+                isDayDoubleZero={ true }
+              />
+            </div>
           </div>
         </div>
         <br />

@@ -27,4 +27,24 @@ export default defineMessages({
     id: 'boilerplate.containers.HomePage.tryme.atPrefix',
     defaultMessage: '@',
   },
+  product: {
+    id: "boilerplate.components.Header.products",
+    defaultMessage: "Products"
+  },
+  News: {
+    id: "boilerplate.components.Header.news",
+    defaultMessage: "News"
+  },
+  aboutus: {
+    id: 'boilerplate.containers.AboutPage.header',
+    defaultMessage: 'About Us',
+  },
+  store: {
+    id: "boilerplate.containers.AdminPage.store",
+    defaultMessage: "Store"
+  },
+  address: {
+    id: "boilerplate.containers.address",
+    defaultMessage: "Address"
+  }
 });

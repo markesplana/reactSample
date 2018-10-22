@@ -7,8 +7,8 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   header: {
-    id: 'boilerplate.containers.NewsPage.header',
-    defaultMessage: 'News',
+    id: 'boilerplate.components.Header.aboutus',
+    defaultMessage: 'About Us',
   },
   addnews: {
     id: 'boilerplate.containers.NewsPage.addnews',
@@ -18,8 +18,8 @@ export default defineMessages({
     id: 'boilerplate.containers.remove',
     defaultMessage: 'Remove',
   },
-  edit: {
-    id: 'boilerplate.containers.edit',
-    defaultMessage: 'Edit',
-  },
+  editabout: {
+    id: "boilerplate.containers.editabout",
+    defaultMessage: "Edit About",
+  }
 });

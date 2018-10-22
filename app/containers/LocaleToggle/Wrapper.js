@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-  padding: 2px;
+  width: 205px;
+  float: right; 
 `;
 
 export default Wrapper;

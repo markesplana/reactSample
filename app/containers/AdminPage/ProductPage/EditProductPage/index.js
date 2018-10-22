@@ -17,11 +17,11 @@ import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
 import axios from 'axios'
 
-import { baseUrl } from '../../../config'
+import { baseUrl } from '../../../../config'
 
 const { TextArea } = Input;
 
-class AddHomeBannerPage extends React.Component {
+class EditProductPage extends React.Component {
   constructor(props){
     super(props)
     this.state = {
@@ -33,8 +33,20 @@ class AddHomeBannerPage extends React.Component {
       productOtherImage: [],
       productOtherImageFile: [],
       uploading: false,
-      text: ""
+      text: "",
+      details: []
     }
+  }
+
+  componentDidMount(){
+    const { id } = this.props.match.params
+    axios.get(`${baseUrl}/products/details/${id}`)
+      .then((response) => {
+        console.log(response.data)
+        this.setState({
+          details: response.data,
+        })
+      })
   }
 
   handleChange = (value) => {
@@ -43,27 +55,38 @@ class AddHomeBannerPage extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const { id } = this.props.match.params 
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
         this.setState({
           uploading: true,
         })
-        const { title, description, photo } = values
+        const { name, description, price, photo, details_image } = values
         const fileData = new FormData();
-        fileData.append('photo', photo[0].originFileObj)
-        fileData.append('title', title);
-        fileData.append('is_home', true);
+        if (photo == undefined){
+
+        }else{
+          fileData.append('photo', photo[0].originFileObj)
+        }
+        if (details_image == undefined){
+
+        }else{
+          fileData.append('details_image', details_image[0].originFileObj );
+        }
+     
+        fileData.append('name', name);
         fileData.append('description', description);
+        fileData.append('price', price);
+        fileData.append('type_id', 1);
     
         const config = { headers: {  "Authorization" : localStorage.token } };
-        axios.post(baseUrl + '/banners/add', fileData, config)
+        axios.post(baseUrl + '/products/update/' + id , fileData, config)
         .then((response) => {
           this.setState({
             uploading: false,
           })
-          this.props.history.push('/admin')
-          console.log(response)
+          this.props.history.push('/products')
         })
         .catch((error) => {
           this.setState({
@@ -84,11 +107,12 @@ class AddHomeBannerPage extends React.Component {
   }
 
   render() {
+    const { details } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="container">
         <Helmet>
-          <title>Add Home Banner</title>
+          <title>Product Details Page</title>
           <meta
             name="description"
             content="Feature page of React.js Boilerplate application"
@@ -114,17 +138,52 @@ class AddHomeBannerPage extends React.Component {
               <div class="col-md-6 col-md-offset-3">
               <Form onSubmit={this.handleSubmit} className="login-form">
                 <FormItem>
-                  <label><FormattedMessage {...messages.title} /></label>
-                  {getFieldDecorator('title', {
-                    rules: [{ required: true, message: 'Please input news title!' }],
+                  <label><FormattedMessage {...messages.name} /></label>
+                  {getFieldDecorator('name',{
+                    initialValue: details.name
+                  }, {
+                    rules: [{ required: true, message: 'Please input product name!' }],
                   })(
                     <Input />
                   )}
                 </FormItem>
                 <FormItem>
-                  <label>1 <FormattedMessage {...messages.bannerimage} /> ( 1020 x 800 pixels )</label>
+                  <label><FormattedMessage {...messages.price} /></label>
+                  {getFieldDecorator('price',{
+                    initialValue: details.price
+                  }, {
+                    rules: [{ required: true, message: 'Please input product price!' }],
+                  })(
+                    <Input />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label>1 <FormattedMessage {...messages.productimage} /> (300 × 300 pixels)</label>
                   <br />
                   {getFieldDecorator('photo', {
+                    valuePropName: 'fileList',
+                    getValueFromEvent: this.normFile,
+                  })(
+                    <Upload name="logo" listType="picture">
+                      <Button>
+                        <Icon type="upload" /> Click to upload
+                      </Button>
+                    </Upload>
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label><FormattedMessage {...messages.productdescription} /></label>
+                  {getFieldDecorator('description',{
+                    initialValue: details.description
+                  }, {
+                    rules: [{ required: true, message: 'Please input product description!' }],
+                  })(
+                    <TextArea rows={4} />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label>1 <FormattedMessage {...messages.otherimage} /> (650px width)</label><br />
+                  {getFieldDecorator('details_image', {
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
                   })(
@@ -158,4 +217,4 @@ const enhance = compose(
   Form.create()
 );
 
-export default enhance(AddHomeBannerPage);
+export default enhance(EditProductPage);

@@ -17,24 +17,31 @@ import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
 import axios from 'axios'
 
-import { baseUrl } from '../../../config'
+import { baseUrl } from '../../../../config'
 
 const { TextArea } = Input;
 
-class AddHomeBannerPage extends React.Component {
+class EditAboutPage extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      name: '',
-      description: '',
-      price: '',
-      productImage: [],
-      productImageFile: [],
-      productOtherImage: [],
-      productOtherImageFile: [],
       uploading: false,
-      text: ""
+      text: "",
+      about: {}
     }
+  }
+
+  componentDidMount = () => {
+    axios.get(baseUrl + '/settings/list')
+    .then((response) => {
+        console.log("Banner LIST", response);
+        this.setState({
+          about: response.data
+        })
+    })
+    .catch(function (error) {
+    console.log(error);
+    })
   }
 
   handleChange = (value) => {
@@ -51,19 +58,17 @@ class AddHomeBannerPage extends React.Component {
         })
         const { title, description, photo } = values
         const fileData = new FormData();
-        fileData.append('photo', photo[0].originFileObj)
+        fileData.append('image', photo.file.originFileObj)
         fileData.append('title', title);
-        fileData.append('is_home', true);
         fileData.append('description', description);
     
         const config = { headers: {  "Authorization" : localStorage.token } };
-        axios.post(baseUrl + '/banners/add', fileData, config)
+        axios.post(baseUrl + '/settings/aboutus', fileData, config)
         .then((response) => {
           this.setState({
             uploading: false,
           })
-          this.props.history.push('/admin')
-          console.log(response)
+          this.props.history.push('/about')
         })
         .catch((error) => {
           this.setState({
@@ -85,17 +90,21 @@ class AddHomeBannerPage extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { about } = this.state
+
+    console.log("about", about)
+
     return (
       <div className="container">
         <Helmet>
-          <title>Add Home Banner</title>
+          <title>Edit About Page</title>
           <meta
             name="description"
             content="Feature page of React.js Boilerplate application"
           />
         </Helmet>
         <H1>
-          <FormattedMessage {...messages.header} />
+          <FormattedMessage {...messages.editabout} />
         </H1>
         <br />
         <div className="row">
@@ -106,7 +115,7 @@ class AddHomeBannerPage extends React.Component {
               bgColor='#f1f1f1'
               spinnerColor='#9ee5f8'
               textColor='#676767'
-              text='Uploading.....'
+              text='Saving.....'
             /> : 
             <div>
             <br />
@@ -115,16 +124,23 @@ class AddHomeBannerPage extends React.Component {
               <Form onSubmit={this.handleSubmit} className="login-form">
                 <FormItem>
                   <label><FormattedMessage {...messages.title} /></label>
-                  {getFieldDecorator('title', {
-                    rules: [{ required: true, message: 'Please input news title!' }],
+                  {getFieldDecorator('title', { 
+                    initialValue: about.about_us_title 
+                    },{
+                    rules: [
+                      { required: true, message: 'Please input news title!'},
+                    ],
+                    
                   })(
                     <Input />
                   )}
                 </FormItem>
                 <FormItem>
-                  <label>1 <FormattedMessage {...messages.bannerimage} /> ( 1020 x 800 pixels )</label>
+                  <label>1 <FormattedMessage {...messages.coverimage} /> ( 250 x 250 pixels )</label>
                   <br />
-                  {getFieldDecorator('photo', {
+                  {getFieldDecorator('photo', 
+                    { initialValue: about.about_us_img },
+                  {
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
                   })(
@@ -133,6 +149,14 @@ class AddHomeBannerPage extends React.Component {
                         <Icon type="upload" /> Click to upload
                       </Button>
                     </Upload>
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label><FormattedMessage {...messages.description} /></label>
+                  {getFieldDecorator('description', { initialValue: about.about_us_description }, {
+                    rules: [{ required: true, message: 'Please input news description!' }],
+                  })(
+                    <TextArea rows={4} />
                   )}
                 </FormItem>
                 <FormItem>
@@ -158,4 +182,4 @@ const enhance = compose(
   Form.create()
 );
 
-export default enhance(AddHomeBannerPage);
+export default enhance(EditAboutPage);

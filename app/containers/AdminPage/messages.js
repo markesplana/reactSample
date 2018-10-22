@@ -22,4 +22,24 @@ export default defineMessages({
     id: 'boilerplate.containers.AdminPage.logo',
     defaultMessage: 'Logo',
   },
+  stores: {
+    id: 'boilerplate.containers.AdminPage.store',
+    defaultMessage: 'Stores',
+  },
+  email: {
+    id: 'boilerplate.containers.AdminPage.adminemail',
+    defaultMessage: 'Admin Email',
+  },
+  edit: {
+    id: 'boilerplate.containers.edit',
+    defaultMessage: 'Edit'
+  },
+  save: {
+    id: "boilerplate.containers.save",
+    defaultMessage: "save"
+  },
+  cancel: {
+    id: "boilerplate.containers.cancel",
+    defaultMessage: "Cancel"
+  }
 });

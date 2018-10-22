@@ -86,6 +86,8 @@ export default class AdminProductPage extends React.Component {
         <span>
           <Divider type="vertical" />
           <a href="javascript:;" onClick={() => { this.handleDelete(record.id) }} >Delete</a>
+          {" "} | {" "} 
+          <a href="javascript:;" onClick={() => { this.props.history.push(`/editproduct/${record.id}`) }} >Edit</a>
         </span>
       ),
     }];

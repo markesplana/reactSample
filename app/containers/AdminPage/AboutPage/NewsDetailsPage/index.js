@@ -10,11 +10,11 @@ import axios from 'axios'
 
 import H1 from 'components/H1';
 import messages from './messages';
-import Countdown from 'react-sexy-countdown'
-import moment from 'moment';
+
+
 import { baseUrl } from '../../../../config'
 
-export default class PromoDetailsPage extends React.Component {
+export default class ProductDetailsPage extends React.Component {
   constructor(props) {
     
     super(props);
@@ -44,11 +44,11 @@ export default class PromoDetailsPage extends React.Component {
 
   render() {
     const { product } = this.state;
-    const endDate = moment(product.promo_expiry)
+    console.log("product detail", product)
     return (
       <div className="container">
         <Helmet>
-          <title>Promo Details Page</title>
+          <title>Product Details Page</title>
           <meta
             name="description"
             content="Feature page of React.js Boilerplate application"
@@ -64,37 +64,10 @@ export default class PromoDetailsPage extends React.Component {
           </div>
           <div className="col-md-8">
             <p><strong>{product.name}</strong></p>
-            <div>
-            <a href={product.link} target="_blank" className="btn btn-primary">
-              <small><FormattedMessage {...messages.link} /></small>
-            </a>
-            </div>
-            <br />  
-            <small><FormattedMessage {...messages.promodescription} />:</small>
+            <small><FormattedMessage {...messages.productdescription} />:</small>
             <p>{product.description}</p>
             <small><FormattedMessage {...messages.price} />:</small>
             <p>{product.price}</p>
-            <small><FormattedMessage {...messages.quantity} />:</small>
-            <p>{product.quantity}</p>
-            <small><FormattedMessage {...messages.time} />:</small>
-            <div style={{ width: 250 }}>
-            <Countdown
-                date={ moment(product.promo_expiry, "YYYY-MM-DD")}
-                onEndCountdown={ (count) => console.log(count)  }
-                displayText={{
-                  Days: 'Days',
-                  Day: 'Day',
-                  Hours: 'Hours',
-                  Min: 'Min',
-                  Sec: 'Sec',
-                }}
-                lastTextTime={{
-                  Day: 'D'
-                }}
-                isDayDoubleZero={ true }
-              />
-            </div>
-            
           </div>
         </div>
         <br />

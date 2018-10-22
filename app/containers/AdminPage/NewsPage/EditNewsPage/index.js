@@ -17,11 +17,11 @@ import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
 import axios from 'axios'
 
-import { baseUrl } from '../../../config'
+import { baseUrl } from '../../../../config'
 
 const { TextArea } = Input;
 
-class AddHomeBannerPage extends React.Component {
+class EditNewsPage extends React.Component {
   constructor(props){
     super(props)
     this.state = {
@@ -33,8 +33,20 @@ class AddHomeBannerPage extends React.Component {
       productOtherImage: [],
       productOtherImageFile: [],
       uploading: false,
-      text: ""
+      text: "",
+      details: [],
     }
+  }
+
+  componentDidMount(){
+    const { id } = this.props.match.params
+    axios.get(`${baseUrl}/news/details/${id}`)
+        .then((response) => {
+          console.log(response.data)
+          this.setState({
+            details: response.data,
+          })
+        })
   }
 
   handleChange = (value) => {
@@ -43,6 +55,7 @@ class AddHomeBannerPage extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const { id } = this.props.match.params
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
@@ -51,26 +64,44 @@ class AddHomeBannerPage extends React.Component {
         })
         const { title, description, photo } = values
         const fileData = new FormData();
-        fileData.append('photo', photo[0].originFileObj)
-        fileData.append('title', title);
-        fileData.append('is_home', true);
-        fileData.append('description', description);
-    
-        const config = { headers: {  "Authorization" : localStorage.token } };
-        axios.post(baseUrl + '/banners/add', fileData, config)
-        .then((response) => {
-          this.setState({
-            uploading: false,
+        if(photo.file == undefined){
+          fileData.append('title', title);
+          fileData.append('description', description);
+          console.log("No Image", photo)
+          const config = { headers: {  "Authorization" : localStorage.token } };
+          axios.post(baseUrl + '/news/update/' + id, fileData, config)
+          .then((response) => {
+            this.setState({
+              uploading: false,
+            })
+            this.props.history.push('/news')
           })
-          this.props.history.push('/admin')
-          console.log(response)
-        })
-        .catch((error) => {
-          this.setState({
-            uploading: false,
+          .catch((error) => {
+            this.setState({
+              uploading: false,
+            })
+            console.log(error);
+          });
+        }else{
+          fileData.append('title', title);
+          fileData.append('description', description);
+          fileData.append('photo', photo.file.originFileObj)
+          const config = { headers: {  "Authorization" : localStorage.token } };
+          axios.post(baseUrl + '/news/update/' + id, fileData, config)
+          .then((response) => {
+            this.setState({
+              uploading: false,
+            })
+            this.props.history.push('/news')
           })
-          console.log(error);
-        });
+          .catch((error) => {
+            this.setState({
+              uploading: false,
+            })
+            console.log(error);
+          });
+        }
+       
       }
     });
   }
@@ -84,11 +115,12 @@ class AddHomeBannerPage extends React.Component {
   }
 
   render() {
+    const { details } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="container">
         <Helmet>
-          <title>Add Home Banner</title>
+          <title>Product Details Page</title>
           <meta
             name="description"
             content="Feature page of React.js Boilerplate application"
@@ -116,23 +148,37 @@ class AddHomeBannerPage extends React.Component {
                 <FormItem>
                   <label><FormattedMessage {...messages.title} /></label>
                   {getFieldDecorator('title', {
+                    initialValue: details.title
+                  },{
                     rules: [{ required: true, message: 'Please input news title!' }],
                   })(
                     <Input />
                   )}
                 </FormItem>
                 <FormItem>
-                  <label>1 <FormattedMessage {...messages.bannerimage} /> ( 1020 x 800 pixels )</label>
+                  <label>1 <FormattedMessage {...messages.newsimage} /> (544 x 336 pixels)</label>
                   <br />
                   {getFieldDecorator('photo', {
+                    initialValue: details.img_url
+                  },{
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
                   })(
-                    <Upload name="logo" listType="picture">
+                    <Upload name="logo" listType="picture" multiple="false">
                       <Button>
                         <Icon type="upload" /> Click to upload
                       </Button>
                     </Upload>
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label><FormattedMessage {...messages.description} /></label>
+                  {getFieldDecorator('description', {
+                    initialValue: details.description
+                  },{
+                    rules: [{ required: true, message: 'Please input news description!' }],
+                  })(
+                    <TextArea rows={4} />
                   )}
                 </FormItem>
                 <FormItem>
@@ -158,4 +204,4 @@ const enhance = compose(
   Form.create()
 );
 
-export default enhance(AddHomeBannerPage);
+export default enhance(EditNewsPage);

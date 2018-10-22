@@ -6,19 +6,22 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+import axios from 'axios'
 
 import H1 from 'components/H1';
 import messages from './messages';
 
-import axios from 'axios';
-import { baseUrl } from '../../config';
+import { Button, List, Avatar, Icon } from 'antd'
 
-export default class FeaturePage extends React.Component {
-  constructor(props){
-    super(props)
+
+import { baseUrl } from '../../../config'
+
+export default class AdminAboutPage extends React.Component {
+  constructor(props) {
+    super(props);
     this.state = {
-      about: {}
-    }
+      about: []
+    };
   }
 
   componentDidMount = () => {
@@ -31,8 +34,33 @@ export default class FeaturePage extends React.Component {
     })
   }
 
+  handleDelete = (id) => {
+    console.log("handleDelete", id)
+    const config = { headers: {  "Authorization" : localStorage.token } };
+    axios.get(baseUrl + '/news/delete/' + id, config)
+    .then((response) => {
+        console.log("delete news", response)
+        location.reload()
+    })
+    .catch(function (error) {
+    console.log(error);
+    })
+}
+  productDetails = (id) => {
+    this.props.history.push(`/product/${id}`)
+  }
+
+
   render() {
-    const { about } = this.state
+    const { about } = this.state;
+    const IconText = ({ type, text }) => (
+      <span>
+        <Icon type={type} style={{ marginRight: 8 }} />
+        {text}
+      </span>
+    );
+
+    
     return (
       <div className="container">
         <Helmet>
@@ -42,9 +70,13 @@ export default class FeaturePage extends React.Component {
             content="Feature page of React.js Boilerplate application"
           />
         </Helmet>
+        <div className="pull-right">
+          <Button type="primary" onClick={() => {this.props.history.push("/editabout")}}><FormattedMessage {...messages.editabout} /></Button>
+        </div>
         <H1>
           <FormattedMessage {...messages.header} />
-          <hr />
+        </H1>
+        <hr />
           <div className="row">
             <div className="col-xs-12 col-md-3">
               <p><strong>{about.about_us_title}</strong></p>
@@ -56,8 +88,6 @@ export default class FeaturePage extends React.Component {
               <img width="250" src={`${baseUrl}/public/${about.about_us_img}`} />
             </div>
           </div>
-
-        </H1>
       </div>
     );
   }

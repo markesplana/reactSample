@@ -7,21 +7,22 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import { Form, Icon, Input, Button, Checkbox, Upload } from 'antd';
+import { Form, Icon, Input, Button, DatePicker, Upload } from 'antd';
 
 import { compose } from 'recompose'
 const FormItem = Form.Item;
+const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
+const { TextArea } = Input;
 import H1 from 'components/H1';
 import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
 import axios from 'axios'
+import moment from 'moment';
 
 import { baseUrl } from '../../../../config'
 
-const { TextArea } = Input;
-
-class AddProductPage extends React.Component {
+class EditPromoPage extends React.Component {
   constructor(props){
     super(props)
     this.state = {
@@ -33,38 +34,57 @@ class AddProductPage extends React.Component {
       productOtherImage: [],
       productOtherImageFile: [],
       uploading: false,
-      text: ""
+      details: []
     }
   }
 
-  handleChange = (value) => {
-    this.setState({ text: value })
+  componentDidMount(){
+    const { id } = this.props.match.params
+    axios.get(`${baseUrl}/products/details/${id}`)
+      .then((response) => {
+        console.log(response.data)
+        this.setState({
+          details: response.data,
+        })
+      })
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const { id } = this.props.match.params 
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
         this.setState({
           uploading: true,
         })
-        const { name, description, price, photo, details_image } = values
+        const { name, description, price, photo, details_image, quantity, promo_expiry, link } = values
         const fileData = new FormData();
-        fileData.append('photo', photo[0].originFileObj)
-        fileData.append('details_image', details_image[0].originFileObj );
+        if (photo == undefined){
+
+        }else{
+          fileData.append('photo', photo[0].originFileObj)
+        }
+        if (details_image == undefined){
+
+        }else{
+          fileData.append('details_image', details_image[0].originFileObj );
+        }
         fileData.append('name', name);
+        fileData.append('quantity', quantity);
+        fileData.append('link', link);
+        fileData.append('promo_expiry', promo_expiry);
         fileData.append('description', description);
         fileData.append('price', price);
-        fileData.append('type_id', 1);
+        fileData.append('type_id', 2);
     
         const config = { headers: {  "Authorization" : localStorage.token } };
-        axios.post(baseUrl + '/products/add', fileData, config)
+        axios.post(baseUrl + '/products/update/' + id, fileData, config)
         .then((response) => {
           this.setState({
             uploading: false,
           })
-          this.props.history.push('/products')
+          this.props.history.push('/promos')
         })
         .catch((error) => {
           this.setState({
@@ -77,19 +97,24 @@ class AddProductPage extends React.Component {
   }
 
   normFile = (e) => {
-    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
     return e && e.fileList;
   }
 
+  onChangeDate = (date, dateString) => {
+    console.log(date, dateString);
+  }
+  
+
   render() {
+    const { details } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="container">
         <Helmet>
-          <title>Product Details Page</title>
+          <title>Promo Details Page</title>
           <meta
             name="description"
             content="Feature page of React.js Boilerplate application"
@@ -117,7 +142,9 @@ class AddProductPage extends React.Component {
                 <FormItem>
                   <label><FormattedMessage {...messages.name} /></label>
                   {getFieldDecorator('name', {
-                    rules: [{ required: true, message: 'Please input product name!' }],
+                    initialValue: details.name
+                  },{
+                    rules: [{ required: true, message: 'Please input promo name!' }],
                   })(
                     <Input />
                   )}
@@ -125,13 +152,46 @@ class AddProductPage extends React.Component {
                 <FormItem>
                   <label><FormattedMessage {...messages.price} /></label>
                   {getFieldDecorator('price', {
-                    rules: [{ required: true, message: 'Please input product price!' }],
+                    initialValue: details.price
+                  },{
+                    rules: [{ required: true, message: 'Please input promo price!' }],
                   })(
                     <Input />
                   )}
                 </FormItem>
                 <FormItem>
-                  <label>1 <FormattedMessage {...messages.productimage} /> (300 × 300 pixels)</label>
+                  <label><FormattedMessage {...messages.quantity} /></label>
+                  {getFieldDecorator('quantity',{
+                    initialValue: details.quantity
+                  }, {
+                    rules: [{ required: true, message: 'Please input promo quantity!' }],
+                  })(
+                    <Input />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label><FormattedMessage {...messages.link} /></label>
+                  {getFieldDecorator('link',{
+                    initialValue: details.link
+                  }, {
+                    rules: [{ required: true, message: 'Please input promo link!' }],
+                  })(
+                    <Input />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label><FormattedMessage {...messages.time} /></label>
+                  <br />
+                  {getFieldDecorator('promo_expiry', {
+                    initialValue: moment(details.promo_expiry, "YYYY-MM-DD") 
+                  },{
+                    rules: [{ message: 'Please input promo expiration!' }],
+                  })(
+                    <DatePicker onChange={this.onChangeDate} />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label><FormattedMessage {...messages.promoimage} /></label>
                   <br />
                   {getFieldDecorator('photo', {
                     valuePropName: 'fileList',
@@ -145,15 +205,18 @@ class AddProductPage extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label><FormattedMessage {...messages.productdescription} /></label>
+                  <label>1 <FormattedMessage {...messages.promodescription} /> (300 × 300 pixels)</label>
                   {getFieldDecorator('description', {
-                    rules: [{ required: true, message: 'Please input product description!' }],
+                    initialValue: details.description
+                  },{
+                    rules: [{ required: true, message: 'Please input promo description!' }],
                   })(
-                    <TextArea rows={4} />
+                    <TextArea rows={6} />
                   )}
                 </FormItem>
                 <FormItem>
-                  <label>1 <FormattedMessage {...messages.otherimage} /> (650px width)</label><br />
+                  <label>1 <FormattedMessage {...messages.otherimage} />  (650px width)</label>
+                  <br />
                   {getFieldDecorator('details_image', {
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
@@ -188,4 +251,4 @@ const enhance = compose(
   Form.create()
 );
 
-export default enhance(AddProductPage);
+export default enhance(EditPromoPage);

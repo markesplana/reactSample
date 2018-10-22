@@ -21,12 +21,6 @@ export default class NewsDetailsPage extends React.Component {
         products: []
     };
   }
-  // eslint-disable-line react/prefer-stateless-function
-  // Since state and props are static,
-  // there's no need to re-render this component
-  shouldComponentUpdate() {
-    return false;
-  }
 
   componentDidMount(){
     console.log("PROPS", this.props.match.params.id)

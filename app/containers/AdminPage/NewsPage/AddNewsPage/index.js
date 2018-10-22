@@ -120,7 +120,7 @@ class AddNewsPage extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label><FormattedMessage {...messages.newsimage} /></label>
+                  <label>1 <FormattedMessage {...messages.newsimage} />  (544 x 336 pixels)</label>
                   <br />
                   {getFieldDecorator('photo', {
                     valuePropName: 'fileList',

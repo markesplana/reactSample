@@ -7,8 +7,8 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   header: {
-    id: 'boilerplate.containers.PromoPage.btnaddpromo',
-    defaultMessage: 'Add Promo',
+    id: 'boilerplate.containers.editpromo',
+    defaultMessage: 'Edit Promo',
   },
   price: {
     id: 'boilerplate.containers.ProductDetailPage.price',

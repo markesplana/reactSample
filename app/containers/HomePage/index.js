@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
@@ -33,12 +34,17 @@ import { changeUsername } from './actions';
 import { makeSelectUsername } from './selectors';
 /* eslint-disable react/prefer-stateless-function */
 
+import messages from './messages';
+
 export class HomePage extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       bannerHome: [],
       products: [],
+      news: [],
+      about: {},
+      stores: []
     };
   }
 
@@ -46,6 +52,33 @@ export class HomePage extends React.PureComponent {
     if (this.props.username && this.props.username.trim().length > 0) {
       this.props.onSubmitForm();
     }
+
+    axios.get(baseUrl + '/stores/list')
+    .then((response) => {
+        console.log("Store LIST", response);
+        this.setState({
+          stores: response.data
+        });
+    })
+    .catch(function (error) {
+    console.log(error);
+    })
+
+    axios
+    .get(`${baseUrl}/settings/list`)
+    .then((response) => {
+      console.log('about', response);
+      this.setState({
+        about: response.data
+      })
+    })
+
+
+    axios.get(`${baseUrl}/news/list`).then(response => {
+      this.setState({
+        news: response.data,
+      });
+    });
 
     axios.get(`${baseUrl}/products/list`).then(response => {
       this.setState({
@@ -64,6 +97,7 @@ export class HomePage extends React.PureComponent {
       .catch(error => {
         console.log(error);
       });
+
   }
 
   onChange = (a, b, c) => {
@@ -74,6 +108,11 @@ export class HomePage extends React.PureComponent {
     this.props.history.push(`/product/${id}`);
   };
 
+  onNewsDetails = id => {
+    this.props.history.push(`/news/${id}`);
+  };
+
+
   render() {
     const { loading, error, repos } = this.props;
     const reposListProps = {
@@ -82,12 +121,17 @@ export class HomePage extends React.PureComponent {
       repos,
     };
 
-    const { bannerHome } = this.state;
+    const { bannerHome, news, about } = this.state;
 
     const productFeatured = this.state.products.slice(
       Math.max(this.state.products.length - 4, 1),
     );
 
+    const latestNews = news.slice(
+      Math.max(news.length - 3),
+    );
+
+    console.log("NEWS", about)
     return (
       <article>
         <Helmet>
@@ -109,11 +153,59 @@ export class HomePage extends React.PureComponent {
                 />
               </Carousel.Item>
             ))}
-            }
           </Carousel>
+          <br />
+          <br />
+          <hr />
           <div className="container">
+            <div className="row">
+              <div className="col-md-6">
+                  <h1>
+                    <FormattedMessage {...messages.News} />
+                  </h1>
+                  {
+                    latestNews.map((item, i) => (
+                      <div className="media" key={i} onClick={() => {this.onNewsDetails(item.id)}} style={{cursor: "pointer"}}>
+                        <div className="media-left">
+                          <span>
+                            <img className="media-object" width="90px" src={`${baseUrl}/public/${item.img_url}`} alt="..." />
+                          </span>
+                        </div>
+                        <div className="media-body">
+                          <h4 className="media-heading">{item.title}</h4>
+                          <p className="ellipsis">
+                              {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  }
+              </div>
+              <div className="col-md-6">
+                  <h1>
+                    <FormattedMessage {...messages.aboutus} />
+                  </h1>
+                    <div className="media" onClick={() => {this.props.history.push("/about")}} style={{cursor: "pointer"}}>
+                      <div className="media-left">
+                        <span>
+                          <img className="media-object" width="90px" src={`${baseUrl}/public/${about.about_us_img}`} alt="..." />
+                        </span>
+                      </div>
+                      <div className="media-body">
+                        <h4 className="media-heading">{about.about_us_title}</h4>
+                        <p className="ellipsis">
+                            {about.about_us_description}
+                        </p>
+                      </div>
+                    </div>
+              </div>
+            </div>
+            <br />
+            <hr />
             <div className="row text-center">
-              <h1>Products</h1>
+               <h1>
+                  <FormattedMessage {...messages.product} />
+              </h1>
               {productFeatured.map((item, index) => (
                 <div className="col-xs-6 col-md-3" key={index}>
                   <a
@@ -122,14 +214,32 @@ export class HomePage extends React.PureComponent {
                     }}
                     className="thumbnail"
                   >
-                    <img src={`${baseUrl}/public/${item.img_url}`} />
+                    <img width="180px" src={`${baseUrl}/public/${item.img_url}`} />
                   </a>
+                    <small>{item.name}</small>
                 </div>
               ))}
-              }
+            </div>
+            <br />
+            <hr />
+            <div className="row text-center">
+               <h1>
+                  <FormattedMessage {...messages.store} />
+              </h1>
+              {this.state.stores.map((item, index) => (
+                <div className="col-xs-6 col-md-3" key={index}>
+                  <a href={item.description} target="_blank">
+                    <img width="180px" src={`${baseUrl}/public/${item.img_url}`} />
+                  </a>
+                  <br />
+                  <small>{item.title}</small>
+                </div>
+              ))}
             </div>
           </div>
         </div>
+        <br />
+        <br />
       </article>
     );
   }

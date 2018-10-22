@@ -37,17 +37,17 @@ export default class AdminNewsPage extends React.Component {
   }
 
   handleDelete = (id) => {
+    console.log("handleDelete", id)
     const config = { headers: {  "Authorization" : localStorage.token } };
-    axios.get(baseUrl + '/products/delete/' + id, config)
+    axios.get(baseUrl + '/news/delete/' + id, config)
     .then((response) => {
-        this.props.history.push("/products")
+        console.log("delete news", response)
         location.reload()
     })
     .catch(function (error) {
     console.log(error);
     })
-  }
-
+}
   productDetails = (id) => {
     this.props.history.push(`/product/${id}`)
   }
@@ -91,6 +91,20 @@ export default class AdminNewsPage extends React.Component {
           renderItem={item => (
             <List.Item
               key={item.title}
+              actions={[<Button 
+                onClick={() => {this.handleDelete(item.id)}} 
+                size="small" 
+                type="danger">
+                <Icon type="delete" /> 
+                <FormattedMessage {...messages.delete} />
+                </Button>,
+                <Button 
+                onClick={() => { this.props.history.push(`/editnews/${item.id}`)}} 
+                size="small" 
+                type="primary">
+                <Icon type="edit" /> 
+                <FormattedMessage {...messages.edit} />
+                </Button>]}
               extra={<img width={272} alt="logo" src={`${baseUrl}/public/${item.img_url}`} />}
             >
               <List.Item.Meta

@@ -120,7 +120,7 @@ class ChangeLogo extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label><FormattedMessage {...messages.logo} /></label>
+                  <label><FormattedMessage {...messages.logo} /> ( 80 x 60 pixels )</label>
                   <br />
                   {getFieldDecorator('photo', {
                     valuePropName: 'fileList',

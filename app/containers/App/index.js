@@ -27,21 +27,39 @@ import AdminProductPage from 'containers/AdminPage/ProductPage/Loadable'
 import AdminPromoPage from 'containers/AdminPage/PromoPage/Loadable'
 import AdminProductDetailsPage from 'containers/AdminPage/ProductPage/ProductDetailsPage/Loadable'
 import AddProductPage from 'containers/AdminPage/ProductPage/AddProductPage/Loadable'
+import EditPromoPage from 'containers/AdminPage/PromoPage/EditPromoPage/Loadable'
+
+import EditProductPage from 'containers/AdminPage/ProductPage/EditProductPage/Loadable'
 import AddPromoPage from 'containers/AdminPage/PromoPage/AddPromoPage/Loadable'
 import PromoDetailsPage from 'containers/PromoDetailsPage/Loadable'
 import AdminPromoDetailsPage from 'containers/AdminPage/PromoPage/PromoDetailsPage/Loadable'
 import AddHomeBanner from 'containers/AdminPage/AddHomeBanner/Loadable'
 import AddProductBanner from 'containers/AdminPage/AddProductBanner/Loadable'
+import AddStore from 'containers/AdminPage/AddStore/Loadable'
+
 
 import AdminNewsPage from 'containers/AdminPage/NewsPage/Loadable'
+import AdminAboutPage from 'containers/AdminPage/AboutPage/Loadable'
 import AddNewsPage from 'containers/AdminPage/NewsPage/AddNewsPage/Loadable'
+import EditNewsPage from 'containers/AdminPage/NewsPage/EditNewsPage/Loadable'
+
+import AdminEditAboutPage from 'containers/AdminPage/AboutPage/EditAboutPage/Loadable'
 import ChangeLogo from 'containers/AdminPage/ChangeLogo/Loadable'
 
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import HeaderComponent from 'components/Header';
-import Footer from 'components/Footer';
-
 import localStorage from "localStorage";
+import LocaleToggle from '../LocaleToggle';
+
+import { List } from 'antd'
+
+import { Link } from 'react-router-dom';
+
+import { Input } from 'antd';
+const Search = Input.Search;
+
+import axios from 'axios';
+import { baseUrl } from '../../config'
 
 import 'antd/dist/antd.css'; 
 import "react-table/react-table.css";
@@ -56,11 +74,96 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
-export default function App() {
-  return (
-    <div>
-      <HeaderComponent />
+class App extends React.Component{
+  constructor(props){
+    super(props)
+    this.state = {
+      search: false,
+      products: [],
+    }
+  }
+
+  productDetails = (id) => {
+    this.props.history.push(`/product/${id}`)
+  }
+
+  onSearch = (value) => {
+    axios.get(`${baseUrl}/products/list?search=${value}`)
+    .then((response) => {
+      this.setState({
+        search: true,
+        products: response.data
+      })
+      console.log("response", response)
+    })
+  }
+
+  onHide = () => {
+    console.log("onHide ====>")
+    this.setState({
+      search: false
+    })
+  }
+
+  render() {
+    return(
       <div>
+      <div className="row">
+          <div className="col-md-6">
+          <Search
+              placeholder="Search Products"
+              style={{ width: 300 }}
+              onSearch={value => { this.onSearch(value) }}
+              enterButton
+            />
+          </div>
+          <div className="col-md-6">
+            <LocaleToggle />
+          </div>
+        </div>
+      <HeaderComponent onHide={this.onHide} />
+      {
+        this.state.search ?
+        <div className="container">
+          {
+            this.state.products.length == 0 ? 
+            <div className="text-center">
+              <p>No result</p>
+            </div>
+            :
+
+          <List
+            itemLayout="vertical"
+            size="small"
+            pagination={{
+              onChange: (page) => {
+                console.log(page);
+              },
+              pageSize: 10,
+            }}
+            dataSource={this.state.products}
+            renderItem={item => (
+              <List.Item
+                key={item.id}
+              >
+              <Link onClick={() => { this.setState({ search: false }) }} class="media" to={`/product/${item.id}`} style={{ cursor: "pointer" }}>
+                <div className="media-left">
+                  <span>
+                    <img width={170} alt="logo" src={`${baseUrl}/public/${item.img_url}`} />
+                  </span>
+                </div>
+                <div className="media-body">
+                  <h4 className="media-heading">{item.name}</h4>
+                  <small>{item.description}</small>
+                </div>
+              </Link>
+              </List.Item>
+            )}
+          />
+          }
+        </div>  
+        :
+        <div>
           {
             localStorage.token == undefined ?
             <Switch>
@@ -88,13 +191,24 @@ export default function App() {
               <Route path="/promo/:id" component={AdminPromoDetailsPage} />
               <Route path="/news" component={AdminNewsPage} />
               <Route path="/addnews" component={AddNewsPage} />
+              <Route path="/editnews/:id" component={EditNewsPage} />
               <Route path="/addhomebanner" component={AddHomeBanner} />
               <Route path="/addproductbanner" component={AddProductBanner} />
+              <Route path="/editproduct/:id" component={EditProductPage} />
+              <Route path="/editpromo/:id" component={EditPromoPage} />
               <Route path="/changelogo" component={ChangeLogo} />
+              <Route path="/about" component={AdminAboutPage} />
+              <Route path="/editabout" component={AdminEditAboutPage} />
+              <Route path="/addstore" component={AddStore} />
               <Route path="" component={NotFoundPage} />
             </Switch>
           }
       </div>
+      }
+      
     </div>
-  );
+    )
+  }
 }
+
+export default App

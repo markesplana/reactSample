@@ -21,7 +21,7 @@ import { baseUrl } from '../../../config'
 
 const { TextArea } = Input;
 
-class AddHomeBannerPage extends React.Component {
+class AddStorePage extends React.Component {
   constructor(props){
     super(props)
     this.state = {
@@ -53,17 +53,16 @@ class AddHomeBannerPage extends React.Component {
         const fileData = new FormData();
         fileData.append('photo', photo[0].originFileObj)
         fileData.append('title', title);
-        fileData.append('is_home', true);
         fileData.append('description', description);
     
         const config = { headers: {  "Authorization" : localStorage.token } };
-        axios.post(baseUrl + '/banners/add', fileData, config)
+        axios.post(baseUrl + '/stores/add', fileData, config)
         .then((response) => {
+          console.log(response)
           this.setState({
             uploading: false,
           })
           this.props.history.push('/admin')
-          console.log(response)
         })
         .catch((error) => {
           this.setState({
@@ -88,7 +87,7 @@ class AddHomeBannerPage extends React.Component {
     return (
       <div className="container">
         <Helmet>
-          <title>Add Home Banner</title>
+          <title>Add Store</title>
           <meta
             name="description"
             content="Feature page of React.js Boilerplate application"
@@ -122,7 +121,15 @@ class AddHomeBannerPage extends React.Component {
                   )}
                 </FormItem>
                 <FormItem>
-                  <label>1 <FormattedMessage {...messages.bannerimage} /> ( 1020 x 800 pixels )</label>
+                  <label><FormattedMessage {...messages.link} /></label>
+                  {getFieldDecorator('description', {
+                    rules: [{ required: true, message: 'Please input news description!' }],
+                  })(
+                    <Input />
+                  )}
+                </FormItem>
+                <FormItem>
+                  <label>1 <FormattedMessage {...messages.bannerimage} /> ( 120 x 60 pixels )</label>
                   <br />
                   {getFieldDecorator('photo', {
                     valuePropName: 'fileList',
@@ -158,4 +165,4 @@ const enhance = compose(
   Form.create()
 );
 
-export default enhance(AddHomeBannerPage);
+export default enhance(AddStorePage);
