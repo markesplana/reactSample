@@ -10,6 +10,8 @@ import { FormattedMessage } from 'react-intl';
 
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
+import renderHTML from 'react-render-html';
+
 
 import reducer from './reducer';
 import saga from './saga';
@@ -174,7 +176,7 @@ export class HomePage extends React.PureComponent {
                         <div className="media-body">
                           <h4 className="media-heading">{item.title}</h4>
                           <p className="ellipsis">
-                              {item.description}
+                            {renderHTML(`${item.description}`)}
                           </p>
                         </div>
                       </div>
@@ -194,7 +196,7 @@ export class HomePage extends React.PureComponent {
                       <div className="media-body">
                         <h4 className="media-heading">{about.about_us_title}</h4>
                         <p className="ellipsis">
-                            {about.about_us_description}
+                          {renderHTML(`${about.about_us_description}`)}
                         </p>
                       </div>
                     </div>

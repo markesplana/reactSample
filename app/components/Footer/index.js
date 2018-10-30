@@ -1,29 +1,18 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
-
-import A from 'components/A';
-import LocaleToggle from 'containers/LocaleToggle';
-import Wrapper from './Wrapper';
-import messages from './messages';
 
 function Footer() {
   return (
-    <Wrapper>
-      <section>
-        <FormattedMessage {...messages.licenseMessage} />
-      </section>
-      <section>
-        <LocaleToggle />
-      </section>
-      <section>
-        <FormattedMessage
-          {...messages.authorMessage}
-          values={{
-            author: <A href="https://twitter.com/mxstbr">Max Stoiber</A>,
-          }}
-        />
-      </section>
-    </Wrapper>
+    <div className="container">
+      <hr />
+      <div className="text-center">
+        <small>元璽生醫股份有限公司版權所有@ 2009 NATCH Biomedical Co.,Ltd All Rights Reserved.
+        <br />
+        地址：新北市板橋區干城路158號8樓 服務電話：(02) 6621-6259
+        <br />
+        產品諮詢專線：0809-003030 服務時間：每週一至週五09:00-18:00</small>
+      </div>
+      <br />
+    </div>
   );
 }
 

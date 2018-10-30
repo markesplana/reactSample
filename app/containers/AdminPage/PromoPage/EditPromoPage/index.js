@@ -13,6 +13,12 @@ import { compose } from 'recompose'
 const FormItem = Form.Item;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
 const { TextArea } = Input;
 import H1 from 'components/H1';
 import messages from './messages';
@@ -25,6 +31,15 @@ import { baseUrl } from '../../../../config'
 class EditPromoPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       name: '',
       description: '',
@@ -38,6 +53,12 @@ class EditPromoPage extends React.Component {
     }
   }
 
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
+
   componentDidMount(){
     const { id } = this.props.match.params
     axios.get(`${baseUrl}/products/details/${id}`)
@@ -46,6 +67,14 @@ class EditPromoPage extends React.Component {
         this.setState({
           details: response.data,
         })
+        const contentBlock = htmlToDraft(response.data.description);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          const editorState = EditorState.createWithContent(contentState);
+          this.setState({
+            editorState
+          })
+        }
       })
   }
 
@@ -74,7 +103,7 @@ class EditPromoPage extends React.Component {
         fileData.append('quantity', quantity);
         fileData.append('link', link);
         fileData.append('promo_expiry', promo_expiry);
-        fileData.append('description', description);
+        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
         fileData.append('price', price);
         fileData.append('type_id', 2);
     
@@ -109,7 +138,7 @@ class EditPromoPage extends React.Component {
   
 
   render() {
-    const { details } = this.state
+    const { details, editorState } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="container">
@@ -206,13 +235,25 @@ class EditPromoPage extends React.Component {
                 </FormItem>
                 <FormItem>
                   <label>1 <FormattedMessage {...messages.promodescription} /> (300 × 300 pixels)</label>
-                  {getFieldDecorator('description', {
+                  <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
+                  {/* {getFieldDecorator('description', {
                     initialValue: details.description
                   },{
                     rules: [{ required: true, message: 'Please input promo description!' }],
                   })(
                     <TextArea rows={6} />
-                  )}
+                  )} */}
                 </FormItem>
                 <FormItem>
                   <label>1 <FormattedMessage {...messages.otherimage} />  (650px width)</label>

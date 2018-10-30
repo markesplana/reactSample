@@ -12,6 +12,12 @@ import { Form, Icon, Input, Button, Checkbox, Upload } from 'antd';
 import { compose } from 'recompose'
 const FormItem = Form.Item;
 
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
 import H1 from 'components/H1';
 import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
@@ -24,6 +30,15 @@ const { TextArea } = Input;
 class EditProductPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       name: '',
       description: '',
@@ -38,6 +53,13 @@ class EditProductPage extends React.Component {
     }
   }
 
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
+
+
   componentDidMount(){
     const { id } = this.props.match.params
     axios.get(`${baseUrl}/products/details/${id}`)
@@ -46,6 +68,14 @@ class EditProductPage extends React.Component {
         this.setState({
           details: response.data,
         })
+        const contentBlock = htmlToDraft(response.data.description);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          const editorState = EditorState.createWithContent(contentState);
+          this.setState({
+            editorState
+          })
+        }
       })
   }
 
@@ -55,6 +85,7 @@ class EditProductPage extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const { editorState } = this.state;
     const { id } = this.props.match.params 
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -76,7 +107,7 @@ class EditProductPage extends React.Component {
         }
      
         fileData.append('name', name);
-        fileData.append('description', description);
+        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
         fileData.append('price', price);
         fileData.append('type_id', 1);
     
@@ -173,13 +204,25 @@ class EditProductPage extends React.Component {
                 </FormItem>
                 <FormItem>
                   <label><FormattedMessage {...messages.productdescription} /></label>
-                  {getFieldDecorator('description',{
+                  <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
+                  {/* {getFieldDecorator('description',{
                     initialValue: details.description
                   }, {
                     rules: [{ required: true, message: 'Please input product description!' }],
                   })(
                     <TextArea rows={4} />
-                  )}
+                  )} */}
                 </FormItem>
                 <FormItem>
                   <label>1 <FormattedMessage {...messages.otherimage} /> (650px width)</label><br />

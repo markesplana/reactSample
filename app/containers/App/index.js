@@ -48,6 +48,7 @@ import ChangeLogo from 'containers/AdminPage/ChangeLogo/Loadable'
 
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import HeaderComponent from 'components/Header';
+import Footer from 'components/Footer';
 import localStorage from "localStorage";
 import LocaleToggle from '../LocaleToggle';
 
@@ -205,7 +206,7 @@ class App extends React.Component{
           }
       </div>
       }
-      
+      <Footer />
     </div>
     )
   }

@@ -12,6 +12,12 @@ import { Form, Icon, Input, Button, Checkbox, Upload } from 'antd';
 import { compose } from 'recompose'
 const FormItem = Form.Item;
 
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
 import H1 from 'components/H1';
 import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
@@ -24,6 +30,15 @@ const { TextArea } = Input;
 class EditNewsPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       name: '',
       description: '',
@@ -38,15 +53,30 @@ class EditNewsPage extends React.Component {
     }
   }
 
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
+
+
   componentDidMount(){
     const { id } = this.props.match.params
     axios.get(`${baseUrl}/news/details/${id}`)
-        .then((response) => {
-          console.log(response.data)
-          this.setState({
-            details: response.data,
-          })
+      .then((response) => {
+        console.log(response.data)
+        this.setState({
+          details: response.data,
         })
+        const contentBlock = htmlToDraft(response.data.description);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          const editorState = EditorState.createWithContent(contentState);
+          this.setState({
+            editorState
+          })
+        }
+      })
   }
 
   handleChange = (value) => {
@@ -55,6 +85,7 @@ class EditNewsPage extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const { editorState } = this.state;
     const { id } = this.props.match.params
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -66,7 +97,7 @@ class EditNewsPage extends React.Component {
         const fileData = new FormData();
         if(photo.file == undefined){
           fileData.append('title', title);
-          fileData.append('description', description);
+          fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
           console.log("No Image", photo)
           const config = { headers: {  "Authorization" : localStorage.token } };
           axios.post(baseUrl + '/news/update/' + id, fileData, config)
@@ -84,7 +115,7 @@ class EditNewsPage extends React.Component {
           });
         }else{
           fileData.append('title', title);
-          fileData.append('description', description);
+          fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
           fileData.append('photo', photo.file.originFileObj)
           const config = { headers: {  "Authorization" : localStorage.token } };
           axios.post(baseUrl + '/news/update/' + id, fileData, config)
@@ -115,7 +146,7 @@ class EditNewsPage extends React.Component {
   }
 
   render() {
-    const { details } = this.state
+    const { details, editorState } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="container">
@@ -173,13 +204,25 @@ class EditNewsPage extends React.Component {
                 </FormItem>
                 <FormItem>
                   <label><FormattedMessage {...messages.description} /></label>
-                  {getFieldDecorator('description', {
+                  <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
+                  {/* {getFieldDecorator('description', {
                     initialValue: details.description
                   },{
                     rules: [{ required: true, message: 'Please input news description!' }],
                   })(
                     <TextArea rows={4} />
-                  )}
+                  )} */}
                 </FormItem>
                 <FormItem>
                   <Button

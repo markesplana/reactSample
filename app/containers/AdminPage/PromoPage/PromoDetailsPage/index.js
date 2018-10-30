@@ -7,6 +7,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import axios from 'axios'
+import renderHTML from 'react-render-html';
 
 import H1 from 'components/H1';
 import messages from './messages';
@@ -71,7 +72,7 @@ export default class PromoDetailsPage extends React.Component {
             </div>
             <br />  
             <small><FormattedMessage {...messages.promodescription} />:</small>
-            <p>{product.description}</p>
+            {renderHTML(`${product.description}`)}
             <small><FormattedMessage {...messages.price} />:</small>
             <p>{product.price}</p>
             <small><FormattedMessage {...messages.quantity} />:</small>

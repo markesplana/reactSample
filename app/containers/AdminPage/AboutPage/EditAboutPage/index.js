@@ -7,15 +7,22 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import { Form, Icon, Input, Button, Checkbox, Upload } from 'antd';
+import { Form, Icon, Input, Button, Upload } from 'antd';
 
 import { compose } from 'recompose'
 const FormItem = Form.Item;
 
 import H1 from 'components/H1';
+import Wysiwyg from 'components/Wysiwyg';
 import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
 import axios from 'axios'
+
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 import { baseUrl } from '../../../../config'
 
@@ -24,6 +31,15 @@ const { TextArea } = Input;
 class EditAboutPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       uploading: false,
       text: "",
@@ -31,13 +47,27 @@ class EditAboutPage extends React.Component {
     }
   }
 
-  componentDidMount = () => {
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
+
+  componentWillMount = () => {
     axios.get(baseUrl + '/settings/list')
     .then((response) => {
         console.log("Banner LIST", response);
         this.setState({
           about: response.data
         })
+        const contentBlock = htmlToDraft(response.data.about_us_description);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          const editorState = EditorState.createWithContent(contentState);
+          this.setState({
+            editorState
+          })
+        }
     })
     .catch(function (error) {
     console.log(error);
@@ -45,6 +75,7 @@ class EditAboutPage extends React.Component {
   }
 
   handleChange = (value) => {
+    console.log("value", value)
     this.setState({ text: value })
   }
 
@@ -57,10 +88,11 @@ class EditAboutPage extends React.Component {
           uploading: true,
         })
         const { title, description, photo } = values
+        const { editorState } = this.state;
         const fileData = new FormData();
         fileData.append('image', photo.file.originFileObj)
         fileData.append('title', title);
-        fileData.append('description', description);
+        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
     
         const config = { headers: {  "Authorization" : localStorage.token } };
         axios.post(baseUrl + '/settings/aboutus', fileData, config)
@@ -90,8 +122,7 @@ class EditAboutPage extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { about } = this.state
-
+    const { about, editorState } = this.state
     console.log("about", about)
 
     return (
@@ -151,14 +182,29 @@ class EditAboutPage extends React.Component {
                     </Upload>
                   )}
                 </FormItem>
-                <FormItem>
+                {/* <FormItem>
                   <label><FormattedMessage {...messages.description} /></label>
                   {getFieldDecorator('description', { initialValue: about.about_us_description }, {
                     rules: [{ required: true, message: 'Please input news description!' }],
                   })(
                     <TextArea rows={4} />
                   )}
-                </FormItem>
+                </FormItem> */}
+                <FormItem>
+                <label><FormattedMessage {...messages.description} /></label>
+                <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
+                </FormItem>  
                 <FormItem>
                   <Button
                     type="primary"

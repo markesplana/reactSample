@@ -10,6 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import H1 from 'components/H1';
 import messages from './messages';
 
+import renderHTML from 'react-render-html';
+
 import axios from 'axios';
 import { baseUrl } from '../../config';
 
@@ -50,9 +52,8 @@ export default class FeaturePage extends React.Component {
               <p><strong>{about.about_us_title}</strong></p>
             </div>
             <div className="col-xs-12 col-md-9">
-              <p>
-              {about.about_us_description}
-              </p>  
+              {renderHTML(`${about.about_us_description}`)}
+              <br />
               <img width="250" src={`${baseUrl}/public/${about.about_us_img}`} />
             </div>
           </div>

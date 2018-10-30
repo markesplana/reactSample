@@ -6,6 +6,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+import renderHTML from 'react-render-html';
 
 import axios from 'axios'
 
@@ -79,7 +80,7 @@ export default class PromoPage extends React.Component {
               </div>
               <div class="media-body">
                 <h4 class="media-heading">{item.name}</h4>
-                <small>{item.description}</small>
+                <small>{renderHTML(`${item.description}`)}</small>
               </div>
             </div>
             </List.Item>

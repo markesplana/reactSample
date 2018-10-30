@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
 import { Button, List, Avatar, Icon } from 'antd'
+import renderHTML from 'react-render-html';
 
 import axios from 'axios'
 
@@ -82,7 +83,7 @@ export default class NewsPage extends React.Component {
               <List.Item.Meta
                 title={<a href={item.href}>{item.title}</a>}
               />
-              {item.description}
+              {renderHTML(`${item.description}`)}
             </List.Item>
           )}
         />

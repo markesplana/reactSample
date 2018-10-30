@@ -12,6 +12,13 @@ import { Form, Icon, Input, Button, Checkbox, Upload } from 'antd';
 import { compose } from 'recompose'
 const FormItem = Form.Item;
 
+
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
 import H1 from 'components/H1';
 import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
@@ -24,6 +31,15 @@ const { TextArea } = Input;
 class AddProductPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       name: '',
       description: '',
@@ -41,6 +57,12 @@ class AddProductPage extends React.Component {
     this.setState({ text: value })
   }
 
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -54,7 +76,7 @@ class AddProductPage extends React.Component {
         fileData.append('photo', photo[0].originFileObj)
         fileData.append('details_image', details_image[0].originFileObj );
         fileData.append('name', name);
-        fileData.append('description', description);
+        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
         fileData.append('price', price);
         fileData.append('type_id', 1);
     
@@ -86,6 +108,7 @@ class AddProductPage extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { editorState } = this.state;
     return (
       <div className="container">
         <Helmet>
@@ -146,11 +169,23 @@ class AddProductPage extends React.Component {
                 </FormItem>
                 <FormItem>
                   <label><FormattedMessage {...messages.productdescription} /></label>
-                  {getFieldDecorator('description', {
+                  <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
+                  {/* {getFieldDecorator('description', {
                     rules: [{ required: true, message: 'Please input product description!' }],
                   })(
                     <TextArea rows={4} />
-                  )}
+                  )} */}
                 </FormItem>
                 <FormItem>
                   <label>1 <FormattedMessage {...messages.otherimage} /> (650px width)</label><br />

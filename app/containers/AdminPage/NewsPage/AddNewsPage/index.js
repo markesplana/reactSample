@@ -17,6 +17,13 @@ import messages from './messages';
 import LoadingScreen from 'react-loading-screen'
 import axios from 'axios'
 
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
+
 import { baseUrl } from '../../../../config'
 
 const { TextArea } = Input;
@@ -24,6 +31,15 @@ const { TextArea } = Input;
 class AddNewsPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       name: '',
       description: '',
@@ -41,6 +57,13 @@ class AddNewsPage extends React.Component {
     this.setState({ text: value })
   }
 
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
+
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -50,10 +73,11 @@ class AddNewsPage extends React.Component {
           uploading: true,
         })
         const { title, description, photo } = values
+        const { editorState } = this.state;
         const fileData = new FormData();
         fileData.append('photo', photo[0].originFileObj)
         fileData.append('title', title);
-        fileData.append('description', description);
+        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
     
         const config = { headers: {  "Authorization" : localStorage.token } };
         axios.post(baseUrl + '/news/add', fileData, config)
@@ -83,6 +107,7 @@ class AddNewsPage extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { editorState } = this.state
     return (
       <div className="container">
         <Helmet>
@@ -135,11 +160,23 @@ class AddNewsPage extends React.Component {
                 </FormItem>
                 <FormItem>
                   <label><FormattedMessage {...messages.description} /></label>
-                  {getFieldDecorator('description', {
+                  {/* {getFieldDecorator('description', {
                     rules: [{ required: true, message: 'Please input news description!' }],
                   })(
                     <TextArea rows={4} />
-                  )}
+                  )} */}
+                  <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
                 </FormItem>
                 <FormItem>
                   <Button

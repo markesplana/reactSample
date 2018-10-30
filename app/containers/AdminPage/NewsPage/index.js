@@ -10,6 +10,7 @@ import axios from 'axios'
 
 import H1 from 'components/H1';
 import messages from './messages';
+import renderHTML from 'react-render-html';
 
 import { Button, List, Avatar, Icon } from 'antd'
 
@@ -110,7 +111,7 @@ export default class AdminNewsPage extends React.Component {
               <List.Item.Meta
                 title={<a href={item.href}>{item.title}</a>}
               />
-              {item.description}
+              {renderHTML(`${item.description}`)}
             </List.Item>
           )}
         />

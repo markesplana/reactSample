@@ -13,6 +13,13 @@ import { compose } from 'recompose'
 const FormItem = Form.Item;
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
+import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+import htmlToDraft from 'html-to-draftjs';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
+
 const { TextArea } = Input;
 import H1 from 'components/H1';
 import messages from './messages';
@@ -24,6 +31,15 @@ import { baseUrl } from '../../../../config'
 class AddPromoPage extends React.Component {
   constructor(props){
     super(props)
+    const html = '';
+    const contentBlock = htmlToDraft(html);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+      const editorState = EditorState.createWithContent(contentState);
+      this.state = {
+        editorState,
+      };
+    }
     this.state = {
       name: '',
       description: '',
@@ -35,6 +51,12 @@ class AddPromoPage extends React.Component {
       uploading: false
     }
   }
+
+  onEditorStateChange = (editorState) => {
+    this.setState({
+      editorState
+    })
+  };
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -52,7 +74,7 @@ class AddPromoPage extends React.Component {
         fileData.append('link', link);
         fileData.append('quantity', quantity);
         fileData.append('promo_expiry', promo_expiry);
-        fileData.append('description', description);
+        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
         fileData.append('price', price);
         fileData.append('type_id', 2);
     
@@ -88,6 +110,7 @@ class AddPromoPage extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { editorState } = this.state;
     return (
       <div className="container">
         <Helmet>
@@ -174,11 +197,23 @@ class AddPromoPage extends React.Component {
                 </FormItem>
                 <FormItem>
                   <label><FormattedMessage {...messages.promodescription} /></label>
-                  {getFieldDecorator('description', {
+                  <Editor
+                    editorState={editorState}
+                    toolbar={{
+                      options: ['inline'],
+                      inline: {
+                        options: ['bold', 'italic', 'underline'],
+                      }
+                    }}
+                    wrapperClassName="demo-wrapper"
+                    editorClassName="demo-editor"
+                    onEditorStateChange={this.onEditorStateChange}
+                  />  
+                  {/* {getFieldDecorator('description', {
                     rules: [{ required: true, message: 'Please input product description!' }],
                   })(
                     <TextArea rows={6} />
-                  )}
+                  )} */}
                 </FormItem>
                 <FormItem>
                   <label>1 <FormattedMessage {...messages.otherimage} />  (650px width)</label>

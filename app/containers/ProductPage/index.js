@@ -9,6 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import axios from 'axios'
 import H1 from 'components/H1';
 import messages from './messages';
+import renderHTML from 'react-render-html';
 
 import Link from 'react-router-dom'
 
@@ -118,7 +119,7 @@ export default class ProductPage extends React.Component {
               </div>
               <div className="media-body">
                 <h4 className="media-heading">{item.name}</h4>
-                <small>{item.description}</small>
+                <small>{renderHTML(`${item.description}`)}</small>
               </div>
             </div>
             </List.Item>

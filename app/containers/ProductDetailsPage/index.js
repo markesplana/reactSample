@@ -10,7 +10,7 @@ import axios from 'axios'
 
 import H1 from 'components/H1';
 import messages from './messages';
-
+import renderHTML from 'react-render-html';
 
 import { baseUrl } from '../../config'
 
@@ -66,7 +66,7 @@ export default class ProductDetailsPage extends React.Component {
           <div className="col-md-8">
             <p><strong>{product.name}</strong></p>
             <small><FormattedMessage {...messages.productdescription} />:</small>
-            <p>{product.description}</p>
+            {renderHTML(`${product.description}`)}
             <small><FormattedMessage {...messages.price} />:</small>
             <p>{product.price}</p>
           </div>
