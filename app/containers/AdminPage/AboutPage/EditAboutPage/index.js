@@ -90,24 +90,45 @@ class EditAboutPage extends React.Component {
         const { title, description, photo } = values
         const { editorState } = this.state;
         const fileData = new FormData();
-        fileData.append('image', photo.file.originFileObj)
-        fileData.append('title', title);
-        fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
-    
-        const config = { headers: {  "Authorization" : localStorage.token } };
-        axios.post(baseUrl + '/settings/aboutus', fileData, config)
-        .then((response) => {
-          this.setState({
-            uploading: false,
+        if(photo.file == undefined){
+          fileData.append('title', title);
+          fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
+      
+          const config = { headers: {  "Authorization" : localStorage.token } };
+          axios.post(baseUrl + '/settings/aboutus', fileData, config)
+          .then((response) => {
+            this.setState({
+              uploading: false,
+            })
+            this.props.history.push('/about')
           })
-          this.props.history.push('/about')
-        })
-        .catch((error) => {
-          this.setState({
-            uploading: false,
+          .catch((error) => {
+            this.setState({
+              uploading: false,
+            })
+            console.log(error);
+          });
+        }else{
+          fileData.append('image', photo.file.originFileObj)
+          fileData.append('title', title);
+          fileData.append('description', draftToHtml(convertToRaw(editorState.getCurrentContent())));
+      
+          const config = { headers: {  "Authorization" : localStorage.token } };
+          axios.post(baseUrl + '/settings/aboutus', fileData, config)
+          .then((response) => {
+            this.setState({
+              uploading: false,
+            })
+            this.props.history.push('/about')
           })
-          console.log(error);
-        });
+          .catch((error) => {
+            this.setState({
+              uploading: false,
+            })
+            console.log(error);
+          });
+        }
+        
       }
     });
   }

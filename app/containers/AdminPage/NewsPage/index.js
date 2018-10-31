@@ -106,7 +106,7 @@ export default class AdminNewsPage extends React.Component {
                 <Icon type="edit" /> 
                 <FormattedMessage {...messages.edit} />
                 </Button>]}
-              extra={<img width={272} alt="logo" src={`${baseUrl}/public/${item.img_url}`} />}
+              extra={<img width={450} alt="logo" src={`${baseUrl}/public/${item.img_url}`} />}
             >
               <List.Item.Meta
                 title={<a href={item.href}>{item.title}</a>}

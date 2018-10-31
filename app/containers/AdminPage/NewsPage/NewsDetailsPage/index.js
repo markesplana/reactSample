@@ -59,10 +59,10 @@ export default class ProductDetailsPage extends React.Component {
         </H1>
         <br />
         <div className="row">
-          <div className="col-md-4 text-center">
+          <div className="col-md-5 text-center">
             <img src={`${baseUrl}/public/${product.img_url}`} />
           </div>
-          <div className="col-md-8">
+          <div className="col-md-7">
             <p><strong>{product.name}</strong></p>
             <small><FormattedMessage {...messages.productdescription} />:</small>
             <p>{product.description}</p>

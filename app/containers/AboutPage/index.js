@@ -48,16 +48,18 @@ export default class FeaturePage extends React.Component {
           <FormattedMessage {...messages.header} />
           <hr />
           <div className="row">
-            <div className="col-xs-12 col-md-3">
-              <p><strong>{about.about_us_title}</strong></p>
-            </div>
-            <div className="col-xs-12 col-md-9">
-              {renderHTML(`${about.about_us_description}`)}
-              <br />
-              <img width="250" src={`${baseUrl}/public/${about.about_us_img}`} />
-            </div>
+            <div className="col-md-12">
+                <div>
+                  <p><strong>{about.about_us_title}</strong></p>
+                </div>
+                <div>
+                {renderHTML(`${about.about_us_description}`)}
+                </div>
+                <div>
+                  <img width="100%" src={`${baseUrl}/public/${about.about_us_img}`} />
+                </div>
+              </div>
           </div>
-
         </H1>
       </div>
     );

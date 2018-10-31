@@ -72,8 +72,8 @@ export default class ProductDetailsPage extends React.Component {
         </div>
         <br />
         <div className="row">
-          <div className="col-md-6 col-md-offset-3 text-center">
-            <img src={`${baseUrl}/public/${product.details_image}`} />
+          <div className="col-md-8 col-md-offset-3 text-center">
+            <img width="100%" src={`${baseUrl}/public/${product.details_image}`} />
           </div>
         </div>
       </div>
