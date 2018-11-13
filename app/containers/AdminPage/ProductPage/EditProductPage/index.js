@@ -138,7 +138,7 @@ class EditProductPage extends React.Component {
   }
 
   render() {
-    const { details } = this.state
+    const { details, editorState } = this.state
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="container">

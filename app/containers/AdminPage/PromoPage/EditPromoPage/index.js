@@ -87,6 +87,7 @@ class EditPromoPage extends React.Component {
         this.setState({
           uploading: true,
         })
+        const { editorState } = this.state;
         const { name, description, price, photo, details_image, quantity, promo_expiry, link } = values
         const fileData = new FormData();
         if (photo == undefined){

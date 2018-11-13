@@ -71,6 +71,7 @@ class AddProductPage extends React.Component {
         this.setState({
           uploading: true,
         })
+        const { editorState } = this.state;
         const { name, description, price, photo, details_image } = values
         const fileData = new FormData();
         fileData.append('photo', photo[0].originFileObj)
